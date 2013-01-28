@@ -13,7 +13,6 @@ class MyClass(QWidget):
         self.initUI()
         
     def initUI(self):
-        print "a7a b2a"
         # set text browser
         self.textBrower = QTextBrowser(self)
         self.textBrower.resize(500, 200)

@@ -1,7 +1,6 @@
 import socket, time
-import threading
 import SocketServer
-from chatUI import *
+from ChatGUI import *
 
 class recvThread(QThread):
     def __init__(self,conn,parent = None):
@@ -9,6 +8,7 @@ class recvThread(QThread):
         self.message = ''
         print("recv thread init")
         self.conn = conn
+        self.start()
 
     def run(self):
         print("run threading")
@@ -17,8 +17,8 @@ class recvThread(QThread):
             self.message = self.conn.recv(1024)
             if not self.message == '':
                 self.emit(SIGNAL("getmessage(QString)"),self.message)
+                print ("thread -------> " + self.message)
                 self.message = ''
-                print "Singal is emitted"
 
     def __del__(self):
         self.quit()
@@ -42,7 +42,7 @@ class serverConncetion(QObject):
         self.host = host
         self.port = port
         self.initConnection()
-        self.initGUI = MyClass("Hussein","Ahmed")
+        self.initGUI = MyClass("Hussein","server")
         self.connect(self.initGUI,SIGNAL("sendMessage(QString)"),self.sendmessage)
         self.connect(self.recThread,SIGNAL("getmessage(QString)"),self.getmessage)
         
@@ -55,15 +55,13 @@ class serverConncetion(QObject):
             self.connectionSocket, addr = serverSocket.accept()
             print "Connect"
             self.recThread = recvThread(self.connectionSocket)
-            self.recThread.start()
         except socket.error:
             print 'Failed to create socket'
             sys.exit()
             
     def sendmessage(self,message):
-        print "sending message 001 " + message
         # send message
-        print "message send"
+        self.connectionSocket.send(message)
         
     def getmessage(self,message):
         self.initGUI.getmessage(message)
